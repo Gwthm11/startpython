@@ -1,0 +1,39 @@
+name: Deploy to GCP with Terraform
+ 
+on:
+  push:
+    branches:
+      - main  # specify the branch you want to trigger the deployment
+ 
+jobs:        
+  terraform:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    
+    - name: Configure Google Cloud credentials
+      env:
+        GCP_SECRET: ${{ secrets.GCP_GKE_SECRET }}
+        GCP_PROJECT: "lumen-b-ctl-047"
+      run: |
+        echo "" > keys.json 
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.15.5
+    
+    - name: Terraform Init
+      run: |
+        terraform init
+
+    - name: Terraform Plan
+      run: |
+        terraform plan
+   
+ 
+    - name: Terraform Apply
+      run: |
+        terraform apply -auto-approve
